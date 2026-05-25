@@ -105,13 +105,17 @@ c.value='';c.focus();}})
 });
 </script></body></html>`;
 
-// Check the code; on success drop a 30-day cookie.
+// How long a visitor stays signed in after entering the code (seconds).
+const GATE_SESSION_SECONDS = 2 * 60 * 60;   // 2 hours
+
+// Check the code; on success drop a session cookie that expires in 2h.
 app.post('/api/gate', (req, res) => {
   if (!GATE_CODE) return res.json({ ok: true });
   const code = String((req.body && req.body.code) || '').trim();
   if (code === GATE_CODE) {
     res.setHeader('Set-Cookie',
-      GATE_COOKIE + '=' + GATE_TOKEN + '; Path=/; HttpOnly; Max-Age=2592000; SameSite=Lax');
+      GATE_COOKIE + '=' + GATE_TOKEN + '; Path=/; HttpOnly; Max-Age=' +
+      GATE_SESSION_SECONDS + '; SameSite=Lax');
     return res.json({ ok: true });
   }
   return res.status(401).json({ ok: false });
