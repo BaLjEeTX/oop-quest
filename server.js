@@ -14,6 +14,7 @@ const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const crypto = require('crypto');
 const { execFile } = require('child_process');
 
 const app = express();
@@ -42,6 +43,86 @@ function writeStore(obj) {
 
 // --- middleware -----------------------------------------------------
 app.use(express.json({ limit: '256kb' }));
+
+// --- access gate ---------------------------------------------------
+// Set the OOPQUEST_GATE_CODE env var to a 6-digit code and visitors
+// must enter it before they can reach the game. Leave it unset and
+// the gate is disabled (useful for local development).
+const GATE_CODE = (process.env.OOPQUEST_GATE_CODE || '').trim();
+const GATE_COOKIE = 'oopq_gate';
+// Cookie value is derived from the code — not a guessable constant.
+const GATE_TOKEN = GATE_CODE
+  ? crypto.createHash('sha256').update('oopquest::' + GATE_CODE).digest('hex').slice(0, 20)
+  : '';
+
+function gatePassed(req) {
+  const raw = req.headers.cookie || '';
+  return raw.split(';').some((p) => p.trim() === GATE_COOKIE + '=' + GATE_TOKEN);
+}
+
+const GATE_PAGE = `<!doctype html><html lang="en"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>OOP Quest — Access Code</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;display:flex;align-items:center;justify-content:center;
+font-family:"Segoe UI",system-ui,sans-serif;
+background:radial-gradient(800px 500px at 50% -10%,rgba(155,108,255,.25),transparent 60%),#0e1020;color:#e8ebff}
+.card{width:340px;max-width:90vw;background:#1c2142;border:1px solid #343b6e;
+border-radius:16px;padding:34px 28px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.crest{font-size:3rem}
+h1{font-size:1.4rem;margin:8px 0 2px}
+p{color:#aab0d8;font-size:.9rem;margin-bottom:20px}
+input{width:100%;font:inherit;font-size:1.7rem;letter-spacing:.45em;text-align:center;
+background:#11142b;color:#ffce5c;border:1px solid #343b6e;border-radius:10px;padding:12px 8px}
+input:focus{outline:none;border-color:#d99b2b}
+button{width:100%;margin-top:14px;font:inherit;font-weight:700;cursor:pointer;
+border:none;border-radius:10px;padding:12px;
+background:linear-gradient(180deg,#ffce5c,#d99b2b);color:#2a1c00}
+.err{color:#ff5d7a;font-size:.85rem;margin-top:12px;min-height:1.1em}
+.shake{animation:sh .35s}
+@keyframes sh{0%,100%{transform:translateX(0)}25%{transform:translateX(-9px)}75%{transform:translateX(9px)}}
+</style></head><body>
+<form class="card" id="f">
+<div class="crest">&#9876;&#65039;</div>
+<h1>OOP Quest</h1>
+<p>Enter the 6-digit access code to continue.</p>
+<input id="c" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="------" autofocus/>
+<button type="submit">Enter</button>
+<div class="err" id="e"></div>
+</form>
+<script>
+var f=document.getElementById('f'),c=document.getElementById('c'),e=document.getElementById('e');
+f.addEventListener('submit',function(ev){
+ev.preventDefault();e.textContent='';
+fetch('/api/gate',{method:'POST',headers:{'Content-Type':'application/json'},
+body:JSON.stringify({code:c.value})})
+.then(function(r){return r.json();})
+.then(function(d){if(d.ok){location.reload();}else{
+e.textContent='Wrong code. Try again.';
+f.classList.remove('shake');void f.offsetWidth;f.classList.add('shake');
+c.value='';c.focus();}})
+.catch(function(){e.textContent='Something went wrong. Try again.';});
+});
+</script></body></html>`;
+
+// Check the code; on success drop a 30-day cookie.
+app.post('/api/gate', (req, res) => {
+  if (!GATE_CODE) return res.json({ ok: true });
+  const code = String((req.body && req.body.code) || '').trim();
+  if (code === GATE_CODE) {
+    res.setHeader('Set-Cookie',
+      GATE_COOKIE + '=' + GATE_TOKEN + '; Path=/; HttpOnly; Max-Age=2592000; SameSite=Lax');
+    return res.json({ ok: true });
+  }
+  return res.status(401).json({ ok: false });
+});
+
+// Everything below is blocked until the visitor has entered the code.
+app.use((req, res, next) => {
+  if (!GATE_CODE || gatePassed(req)) return next();
+  res.status(200).send(GATE_PAGE);
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- API ------------------------------------------------------------
