@@ -656,22 +656,14 @@ class GameConfig {
           '<pre id="runOut" class="forge-out hidden"></pre>'
         : '');
 
-    const editor = body.querySelector('#editor');
-    editor.value = ch.starter || '';
-    // Tab inserts spaces instead of moving focus.
-    editor.addEventListener('keydown', function (e) {
-      if (e.key === 'Tab') {
-        e.preventDefault();
-        const s = editor.selectionStart, en = editor.selectionEnd;
-        editor.value = editor.value.slice(0, s) + '    ' + editor.value.slice(en);
-        editor.selectionStart = editor.selectionEnd = s + 4;
-      }
-    });
+    const editorEl = body.querySelector('#editor');
+    editorEl.value = ch.starter || '';
+    const cm = OOPEditor.makeJavaEditor(editorEl, { height: 240 });
 
     let solved = false;
     function check() {
       if (solved) return;
-      const result = OOPChecker.evaluate(editor.value, ch.checks);
+      const result = OOPChecker.evaluate(cm.getValue(), ch.checks);
       let list = '<ul class="check-list">';
       result.results.forEach(function (r) {
         list += '<li class="' + (r.passed ? 'pass' : 'fail') + '">' +
@@ -684,7 +676,7 @@ class GameConfig {
 
       if (result.passed) {
         solved = true;
-        editor.disabled = true;
+        cm.setOption('readOnly', true);
         pass('<div style="margin-top:8px"><b>' + result.score + ' / ' + result.total +
           ' checks passed.</b></div>' + list);
       } else if (result.empty) {
@@ -702,7 +694,7 @@ class GameConfig {
         runOut.classList.remove('hidden');
         runOut.className = 'forge-out';
         runOut.textContent = 'Compiling on the JVM…';
-        const full = (ch.scaffold ? ch.scaffold + '\n\n' : '') + editor.value;
+        const full = (ch.scaffold ? ch.scaffold + '\n\n' : '') + cm.getValue();
         runJava(full, 'compile').then(function (r) {
           compileBtn.disabled = false;
           compileBtn.textContent = '▶ Compile on a real JVM';
@@ -850,18 +842,11 @@ class GameConfig {
       sel.appendChild(o);
     });
     editor.value = FORGE_EXAMPLES[0].code;
+    const cm = OOPEditor.makeJavaEditor(editor, { height: 360 });
     sel.addEventListener('change', function () {
-      editor.value = FORGE_EXAMPLES[Number(sel.value)].code;
+      cm.setValue(FORGE_EXAMPLES[Number(sel.value)].code);
       out.textContent = '(run your code to see the output here)';
       out.className = 'forge-out';
-    });
-    editor.addEventListener('keydown', function (e) {
-      if (e.key === 'Tab') {
-        e.preventDefault();
-        const s = editor.selectionStart, en = editor.selectionEnd;
-        editor.value = editor.value.slice(0, s) + '    ' + editor.value.slice(en);
-        editor.selectionStart = editor.selectionEnd = s + 4;
-      }
     });
 
     runBtn.onclick = function () {
@@ -869,7 +854,7 @@ class GameConfig {
       runBtn.textContent = '⏳ Running…';
       out.className = 'forge-out';
       out.textContent = 'Compiling and running on the JVM…';
-      runJava(editor.value, 'run').then(function (r) {
+      runJava(cm.getValue(), 'run').then(function (r) {
         runBtn.disabled = false;
         runBtn.textContent = '▶ Run Code';
         if (!r.available) {

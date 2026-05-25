@@ -413,6 +413,49 @@ main {
   border-radius: 10px; padding: 4px 16px 14px;
 }
 
+/* ---------- CODE EDITOR (CodeMirror) ------------------------------ */
+.CodeMirror {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-family: "Consolas", "Monaco", monospace;
+  font-size: .9rem;
+  line-height: 1.55;
+  margin-bottom: 4px;
+}
+.cm-s-oopquest.CodeMirror { background: var(--code-bg); color: #d6e7ff; }
+.cm-s-oopquest .CodeMirror-gutters { background: #0c0f24; border-right: 1px solid var(--line); }
+.cm-s-oopquest .CodeMirror-linenumber { color: #565d8f; }
+.cm-s-oopquest .CodeMirror-cursor { border-left: 2px solid var(--gold); }
+.cm-s-oopquest div.CodeMirror-selected { background: rgba(155,108,255,.28); }
+.cm-s-oopquest .CodeMirror-line::selection,
+.cm-s-oopquest .CodeMirror-line > span::selection { background: rgba(155,108,255,.4); }
+.cm-s-oopquest .CodeMirror-activeline-background { background: rgba(255,255,255,.03); }
+.cm-s-oopquest .cm-keyword     { color: #ff9f6b; font-weight: 600; }
+.cm-s-oopquest .cm-def         { color: #6cc6ff; }
+.cm-s-oopquest .cm-variable    { color: #d6e7ff; }
+.cm-s-oopquest .cm-variable-2  { color: #b6c2ff; }
+.cm-s-oopquest .cm-variable-3,
+.cm-s-oopquest .cm-type        { color: #43d9a3; }
+.cm-s-oopquest .cm-string      { color: #ffd9a8; }
+.cm-s-oopquest .cm-string-2    { color: #ffd9a8; }
+.cm-s-oopquest .cm-number      { color: #ffce5c; }
+.cm-s-oopquest .cm-atom        { color: #ffce5c; }
+.cm-s-oopquest .cm-comment     { color: #6b73a0; font-style: italic; }
+.cm-s-oopquest .cm-operator    { color: #c7d0ff; }
+.cm-s-oopquest .cm-bracket     { color: #d6e7ff; }
+.cm-s-oopquest .cm-meta        { color: #9b6cff; }
+.cm-s-oopquest .CodeMirror-matchingbracket {
+  color: var(--gold) !important; font-weight: 700;
+  border-bottom: 1px solid var(--gold);
+}
+.cm-s-oopquest .CodeMirror-nonmatchingbracket { color: var(--bad) !important; }
+/* lint tooltip readable on the dark theme */
+.CodeMirror-lint-tooltip {
+  background: #232a52; color: #e8ebff;
+  border: 1px solid var(--bad); border-radius: 6px;
+  font-family: "Segoe UI", system-ui, sans-serif; font-size: .82rem;
+}
+
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 .fade { animation: rise .35s ease; }
 
