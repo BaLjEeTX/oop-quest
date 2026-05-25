@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OOP Quest — Learn Java OOP from 0 to LLD Interviews</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Top status bar (hidden on the title screen) -->
+  <header id="hud" class="hud hidden">
+    <div class="hud-left">
+      <span class="hud-logo">⚔️ OOP Quest</span>
+    </div>
+    <div class="hud-right">
+      <div class="hud-stat" title="Hero">
+        <span class="hud-icon">🧙</span><span id="hud-hero">—</span>
+      </div>
+      <div class="hud-stat" title="Hero level">
+        Lv <span id="hud-level">1</span>
+      </div>
+      <div class="hud-xp" title="Experience">
+        <div class="hud-xp-bar"><div id="hud-xp-fill" class="hud-xp-fill"></div></div>
+        <span id="hud-xp-text">0 XP</span>
+      </div>
+      <button id="btn-map" class="btn btn-ghost">🗺️ Map</button>
+      <button id="btn-forge" class="btn btn-ghost" title="Open the Java sandbox">🔨 Forge</button>
+      <button id="btn-sim" class="btn btn-ghost" title="Practice open-ended LLD problems">🎯 Interview</button>
+      <button id="btn-reset" class="btn btn-ghost" title="Erase progress">↺</button>
+    </div>
+  </header>
+
+  <main id="screen"><!-- screens are rendered here by game.js --></main>
+
+  <footer class="footer">
+    OOP Quest · a quest-RPG that teaches Object-Oriented Programming in Java —
+    from your first class to acing an LLD interview.
+  </footer>
+
+  <!-- toast / save indicator -->
+  <div id="toast" class="toast"></div>
+
+  <script src="js/checker.js"></script>
+  <script src="js/curriculum.js"></script>
+  <script src="js/simulations.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

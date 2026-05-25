@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Runtime data (hero progress is created on first run)
+data/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment / secrets
+.env
+.env.*
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

@@ -1,0 +1,15 @@
+{
+  "name": "oop-quest",
+  "version": "1.0.0",
+  "description": "OOP Quest — an RPG that teaches Object-Oriented Programming in Java from zero to advanced (SOLID, design patterns, LLD interviews).",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["oop", "java", "lld", "interview", "game", "learning", "solid"],
+  "author": "OOP Quest",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
